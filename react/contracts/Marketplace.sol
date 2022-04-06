@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract MarketPlace is ReentrancyGuard {
-    IERC20 weth;
+contract Marketplace {
+    IERC20 public weth;
     address payable public immutable feeAccount;
     uint256 public immutable feePercent;
     uint256 public listingCount;
@@ -22,7 +22,6 @@ contract MarketPlace is ReentrancyGuard {
         uint256 listingId;
         uint256 tokenId;
         uint256 reservePrice;
-        uint256 startPrice;
         uint256 currentPrice;
         address payable seller;
         IERC721 nft;
@@ -31,6 +30,7 @@ contract MarketPlace is ReentrancyGuard {
         bool escrow;
         address payable buyer;
         uint256 escrowClosingTime;
+        uint256 bidCounter;
     }
 
     mapping(uint256 => Listing) public listings;
@@ -59,8 +59,8 @@ contract MarketPlace is ReentrancyGuard {
         address buyer
     );
 
-    constructor(uint256 _feePercent, IERC20 _weth) {
-        weth = _weth;
+    constructor(uint256 _feePercent, address _weth) {
+        weth = IERC20(_weth);
         feeAccount = payable(msg.sender);
         feePercent = _feePercent;
     }
@@ -72,57 +72,55 @@ contract MarketPlace is ReentrancyGuard {
         uint256 _tokenId,
         IERC721 _nft,
         bool _escrow
-    ) external nonReentrant {
+    ) external {
         require(_reservePrice >= 0, "Invalid reserve price");
         require(
             _reservePrice >= _startPrice,
             "Start price cannot be higher than reserve"
         );
-        require(
-            _closingTime >= (block.timestamp + 1 days),
-            "Auction length must be at least 1 day"
-        );
+        require(_closingTime >= (1), "Auction length must be at least 1 day");
         listingCount++;
         _nft.transferFrom(msg.sender, address(this), _tokenId);
         listings[listingCount] = Listing(
             listingCount,
             _tokenId,
-            _reservePrice,
-            _startPrice,
-            _startPrice,
+            (_reservePrice * (10**16)),
+            (_startPrice * (10**16)),
             payable(msg.sender),
             _nft,
             AUCTION_STATE.OPEN,
-            _closingTime,
+            (block.timestamp + (_closingTime * 1 days)),
             _escrow,
             payable(address(0)),
-            (_closingTime + (7 days))
+            (_closingTime + (7 days)),
+            0
         );
         emit Listed(listingCount, msg.sender);
     }
 
-    function bid(uint256 _listingId, uint256 _bidPrice) external nonReentrant {
-        Listing memory listing = listings[_listingId];
-        address payable bidder = payable(msg.sender);
+    function bid(uint256 _listingId, uint256 _bidPrice) external {
+        uint256 bidPrice = _bidPrice * (10**16);
+        Listing storage listing = listings[_listingId];
         require(
-            weth.balanceOf(bidder) > listing.currentPrice,
+            weth.balanceOf(msg.sender) > listing.currentPrice,
             "You don't have enough ETH to cover this bid!"
         );
         require(
-            _bidPrice > listing.currentPrice,
+            bidPrice > listing.currentPrice,
             "Bid must be more than the current price, duh!"
         );
         require(
             listing.auctionState == AUCTION_STATE.OPEN,
             "This item is closed for bidding"
         );
-        weth.approve(address(this), _bidPrice);
-        listing.currentPrice = _bidPrice;
-        listing.buyer = bidder;
-        emit Bid(_listingId, _bidPrice, listing.seller, bidder);
+        listing.buyer = payable(msg.sender);
+        weth.approve(address(this), bidPrice);
+        listing.currentPrice = bidPrice;
+        listing.bidCounter++;
+        emit Bid(_listingId, bidPrice, listing.seller, listing.buyer);
     }
 
-    function endAuction(uint256 _listingId) external nonReentrant {
+    function endAuction(uint256 _listingId) external payable {
         Listing memory listing = listings[_listingId];
         require(
             msg.sender == listing.seller || msg.sender == listing.buyer,
@@ -174,7 +172,7 @@ contract MarketPlace is ReentrancyGuard {
         }
     }
 
-    function confirmEscrow(uint256 _listingId) external payable nonReentrant {
+    function confirmEscrow(uint256 _listingId) external payable {
         Listing memory listing = listings[_listingId];
         require(msg.sender == listing.buyer, "Only buyer can finalize escrow");
         require(listing.auctionState == AUCTION_STATE.PENDING);
@@ -197,7 +195,7 @@ contract MarketPlace is ReentrancyGuard {
         emit confirmedEscrow(_listingId, listing.seller);
     }
 
-    function withdrawEscrow(uint256 _listingId) external payable nonReentrant {
+    function withdrawEscrow(uint256 _listingId) external payable {
         Listing memory listing = listings[_listingId];
         require(
             msg.sender == listing.buyer,
