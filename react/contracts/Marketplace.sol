@@ -80,6 +80,7 @@ contract Marketplace {
         );
         require(_closingTime >= (1), "Auction length must be at least 1 day");
         listingCount++;
+        //_nft.setApprovalForAll(address(this), true);
         _nft.transferFrom(msg.sender, address(this), _tokenId);
         listings[listingCount] = Listing(
             listingCount,
@@ -114,13 +115,13 @@ contract Marketplace {
             "This item is closed for bidding"
         );
         listing.buyer = payable(msg.sender);
-        weth.approve(address(this), bidPrice);
+        IERC20(weth).approve(address(this), bidPrice);
         listing.currentPrice = bidPrice;
         listing.bidCounter++;
         emit Bid(_listingId, bidPrice, listing.seller, listing.buyer);
     }
 
-    function endAuction(uint256 _listingId) external payable {
+    function endAuction(uint256 _listingId) external {
         Listing memory listing = listings[_listingId];
         require(
             msg.sender == listing.seller || msg.sender == listing.buyer,
@@ -172,7 +173,7 @@ contract Marketplace {
         }
     }
 
-    function confirmEscrow(uint256 _listingId) external payable {
+    function confirmEscrow(uint256 _listingId) external {
         Listing memory listing = listings[_listingId];
         require(msg.sender == listing.buyer, "Only buyer can finalize escrow");
         require(listing.auctionState == AUCTION_STATE.PENDING);
@@ -180,11 +181,13 @@ contract Marketplace {
             block.timestamp < listing.escrowClosingTime,
             "Escrow has expired, the sale will be reversed"
         );
-        listing.seller.transfer(listing.currentPrice * (1 - feePercent));
+        listing.seller.transfer(
+            listing.currentPrice * (1 - (100 - feePercent / 100))
+        );
         weth.transferFrom(
             address(this),
             feeAccount,
-            listing.currentPrice * feePercent
+            listing.currentPrice * (feePercent / 100)
         );
         listing.nft.safeTransferFrom(
             address(this),
@@ -195,7 +198,7 @@ contract Marketplace {
         emit confirmedEscrow(_listingId, listing.seller);
     }
 
-    function withdrawEscrow(uint256 _listingId) external payable {
+    function withdrawEscrow(uint256 _listingId) external {
         Listing memory listing = listings[_listingId];
         require(
             msg.sender == listing.buyer,
@@ -209,7 +212,7 @@ contract Marketplace {
         weth.transferFrom(
             address(this),
             listing.buyer,
-            listing.currentPrice * (1 - feePercent)
+            listing.currentPrice * (100 - feePercent)
         );
         listing.nft.safeTransferFrom(
             address(this),
