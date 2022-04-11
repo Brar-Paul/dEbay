@@ -12,7 +12,7 @@ import MarketplaceAbi from './contractsData/Marketplace.json'
 import MarketplaceAddress from './contractsData/Marketplace-address.json'
 import NFTAbi from './contractsData/NFT.json'
 import NFTAddress from './contractsData/NFT-address.json'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { ethers } from "ethers"
 import { Spinner } from 'react-bootstrap'
 import React from 'react'
@@ -24,7 +24,6 @@ function App() {
     const [account, setAccount] = useState(null)
     const [nft, setNFT] = useState({})
     const [marketplace, setMarketplace] = useState({})
-    const [listing, setListing] = useState({})
     // MetaMask Login/Connect
     const web3Handler = async () => {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -80,25 +79,23 @@ function App() {
                         </div>
                     ) : (
                         <Routes>
-                            <Route path="./components/Home" element={
+                            <Route path="/" element={
                                 <Home marketplace={marketplace} nft={nft} />
                             } />
-                            <Route path="./components/create" element={
+                            <Route path="/create" element={
                                 <Create marketplace={marketplace} nft={nft} />
                             } />
-                            <Route path="./components/my-listed-items" element={
+                            <Route path="/my-listed-items" element={
                                 <MyListedItems marketplace={marketplace} nft={nft} account={account} />
                             } />
-                            <Route path="./components/my-purchases" element={
+                            <Route path="/my-purchases" element={
                                 <MyPurchases marketplace={marketplace} nft={nft} account={account} />
                             } />
                         </Routes>
                     )}
                 </div>
-                <h1>NFT Contract address {nft.address}</h1>
-                <h1>Marketplace Contract Address {marketplace.address}</h1>
-                <br></br>
-                <h3>Marketplace Listing count {marketplace.listingCount}</h3>
+                <h1> NFT Address: {nft.address}</h1>
+                <h2> Marketplace Address: {marketplace.address}</h2>
             </div>
         </BrowserRouter>
 

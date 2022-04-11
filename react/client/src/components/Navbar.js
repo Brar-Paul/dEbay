@@ -11,7 +11,7 @@ const Navigation = ({ web3Handler, account }) => {
             <Container>
                 <Navbar.Brand href="">
                     <img src={market} width="40" height="40" className="" alt="" />
-                    &nbsp; Paul's NFT Bazaar
+                    &nbsp; dEbay
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
