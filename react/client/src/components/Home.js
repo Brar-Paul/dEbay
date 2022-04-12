@@ -15,7 +15,7 @@ const Home = ({ marketplace, nft }) => {
         let listings = []
         for (let i = 1; i <= listingCount; i++) {
             const listing = await marketplace.listings(i)
-            if (listing) {
+            if (listing.auctionState === 'OPEN') {
                 // get uri url from nft contract
                 const uri = await nft.tokenURI(listing.tokenId)
                 // use uri to fetch the nft metadata stored on ipfs 
@@ -23,7 +23,6 @@ const Home = ({ marketplace, nft }) => {
                 const response = await fetch(uri)
 
                 const metadata = await response.json()
-                console.log('got metadata')
                 // get current price of listing
                 const currentPrice = listing.currentPrice
                 // push to array
