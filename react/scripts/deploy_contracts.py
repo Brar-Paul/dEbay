@@ -1,4 +1,5 @@
-from brownie import Marketplace, WETH, NFT, accounts, network, config
+from brownie import Marketplace, WETH, accounts, network, config
+from web3 import Web3
 
 
 def deployMarketplace():
@@ -6,15 +7,9 @@ def deployMarketplace():
     if network.show_active() == "development":
         weth = deployWETH()
     else:
-        weth = "0xC778417E063141139FCE010982780140AA0CD5AB"
-    marketplace = Marketplace.deploy(1, weth, {"from": account})
+        weth = config["networks"][network.show_active()]["weth_token"]
+    marketplace = Marketplace.deploy(2, weth, {"from": account}, publish_source=True)
     print(f"Marketplace deployed to {marketplace.address}")
-
-
-def deployNFT():
-    account = get_account()
-    nft = NFT.deploy({"from": account})
-    print(f"NFT contract deployed to {nft.address}")
 
 
 def deployWETH():
@@ -34,4 +29,3 @@ def get_account(index=None, id=None):
 
 def main():
     deployMarketplace()
-    deployNFT()

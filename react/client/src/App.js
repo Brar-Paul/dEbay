@@ -8,10 +8,9 @@ import Home from './components/Home.js'
 import Create from './components/Create.js'
 import MyListedItems from './components/MyListedItems.js'
 import MyPurchases from './components/MyPurchases.js'
-import MarketplaceAbi from './contractsData/Marketplace.json'
-import MarketplaceAddress from './contractsData/Marketplace-address.json'
-import NFTAbi from './contractsData/NFT.json'
-import NFTAddress from './contractsData/NFT-address.json'
+import helperConfig from "../helper-config.json"
+import networkMapping from "./artifacts/deployments/map.json"
+import { useEthers, ChainId } from "@usedapp/core"
 import { useState } from 'react'
 import { ethers } from "ethers"
 import { Spinner } from 'react-bootstrap'
@@ -22,7 +21,6 @@ import './App.css';
 function App() {
     const [loading, setLoading] = useState(true)
     const [account, setAccount] = useState(null)
-    const [nft, setNFT] = useState({})
     const [marketplace, setMarketplace] = useState({})
     // MetaMask Login/Connect
     const web3Handler = async () => {
@@ -44,11 +42,13 @@ function App() {
         loadContracts(signer)
     }
     const loadContracts = async (signer) => {
+        // Get Address and ABI of Marketplace
+        const { chainId, error } = useEthers()
+        const marketplaceAddress = chainId ? networkMapping[String(chainId)]["Marketplace"][0] : constants.AddressZero
+        const marketplaceAbi = await import(`./artifacts/deployments/${String(chainId)}/${marketplaceAddress}.json`)
         // Get deployed copies of contracts
-        const marketplace = new ethers.Contract(MarketplaceAddress.address, MarketplaceAbi.abi, signer)
+        const marketplace = new ethers.Contract(marketplaceAddress, marketplaceAbi.abi, signer)
         setMarketplace(marketplace)
-        const nft = new ethers.Contract(NFTAddress.address, NFTAbi.abi, signer)
-        setNFT(nft)
         setLoading(false)
     }
 
@@ -80,21 +80,20 @@ function App() {
                     ) : (
                         <Routes>
                             <Route path="/" element={
-                                <Home marketplace={marketplace} nft={nft} />
+                                <Home marketplace={marketplace} />
                             } />
                             <Route path="/create" element={
-                                <Create marketplace={marketplace} nft={nft} />
+                                <Create marketplace={marketplace} />
                             } />
                             <Route path="/my-listed-items" element={
-                                <MyListedItems marketplace={marketplace} nft={nft} account={account} />
+                                <MyListedItems marketplace={marketplace} account={account} />
                             } />
                             <Route path="/my-purchases" element={
-                                <MyPurchases marketplace={marketplace} nft={nft} account={account} />
+                                <MyPurchases marketplace={marketplace} account={account} />
                             } />
                         </Routes>
                     )}
                 </div>
-                <h1> NFT Address: {nft.address}</h1>
                 <h2> Marketplace Address: {marketplace.address}</h2>
             </div>
         </BrowserRouter>

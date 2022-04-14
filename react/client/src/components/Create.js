@@ -5,7 +5,7 @@ import { Row, Form, Button } from 'react-bootstrap'
 import { create } from 'ipfs-http-client'
 const client = create('http://127.0.0.1:5001/api/v0/add')
 
-const Create = ({ marketplace, nft }) => {
+const Create = ({ marketplace }) => {
     const [image, setImage] = useState('')
     const [reserve, setReserve] = useState(null)
     const [name, setName] = useState('')
