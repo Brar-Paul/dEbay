@@ -147,6 +147,7 @@ contract Marketplace is ReentrancyGuard {
             listing.auctionState == 1 || listing.auctionState == 3,
             "Action is not authorized"
         );
+        require(listing.seller == msg.sender);
         uint256 feeAmount = listing.currentPrice * (feePercent / 100);
         weth.approve(address(this), feeAmount);
         require(
