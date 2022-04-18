@@ -9,7 +9,7 @@ const Home = ({ marketplace }) => {
     const [loading, setLoading] = useState(true)
     const [listings, setListings] = useState([])
     const loadMarketplaceListings = async () => {
-        // Load all active listings
+        // Load all active listings 
         let listingCount = await marketplace.listingCount()
         listingCount = listingCount.toNumber()
         let listings = []

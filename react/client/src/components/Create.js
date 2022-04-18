@@ -16,6 +16,7 @@ const Create = ({ marketplace }) => {
 
     const uploadToIPFS = async (event) => {
         event.preventDefault()
+        // No longer needed 
         const file = event.target.files[0]
         if (typeof file !== 'undefined') {
             try {
