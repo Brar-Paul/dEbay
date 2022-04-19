@@ -8,13 +8,15 @@ import Home from './components/Home.js'
 import Create from './components/Create.js'
 import MyListedItems from './components/MyListedItems.js'
 import MyPurchases from './components/MyPurchases.js'
-import helperConfig from "../helper-config.json"
+import helperConfig from "./helper-config.json"
 import networkMapping from "./artifacts/deployments/map.json"
 import { useEthers, ChainId } from "@usedapp/core"
 import { useState } from 'react'
 import { ethers } from "ethers"
 import { Spinner } from 'react-bootstrap'
 import React from 'react'
+import Marketplace from './artifacts/contracts/Marketplace.json'
+import { constants, utils } from 'ethers'
 
 import './App.css';
 
@@ -39,32 +41,20 @@ function App() {
             setAccount(accounts[0])
             await web3Handler()
         })
-        loadContracts(signer)
+        loadContracts(signer, provider)
     }
-    const loadContracts = async (signer) => {
+    const loadContracts = async (signer, provider) => {
         // Get Address and ABI of Marketplace
-        const { chainId, error } = useEthers()
-        const marketplaceAddress = chainId ? networkMapping[String(chainId)]["Marketplace"][0] : constants.AddressZero
-        const marketplaceAbi = await import(`./artifacts/deployments/${String(chainId)}/${marketplaceAddress}.json`)
+        const chainId = provider.ChainId
+        const { abi } = Marketplace
+        const marketplaceAddress = networkMapping['4']["Marketplace"][0]
+        const marketplaceInterface = new utils.Interface(abi)
         // Get deployed copies of contracts
-        const marketplace = new ethers.Contract(marketplaceAddress, marketplaceAbi.abi, signer)
+        const marketplace = new ethers.Contract(marketplaceAddress, marketplaceInterface, signer)
         setMarketplace(marketplace)
         setLoading(false)
     }
 
-    // const getListings = async () => {
-    //     let listing = await marketplace.listings(1);
-    //     setListing(listing)
-    // }
-    // useEffect(() => {
-    //     getListings()
-    // })
-    // if (loading) return (
-    //     <main style={{ padding: "1rem 0" }}>
-    //         <h2>Loading...</h2>
-    //     </main>
-    // )
-    // cd
     return (
         <BrowserRouter>
             <div className="App">

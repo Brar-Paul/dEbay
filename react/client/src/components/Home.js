@@ -2,30 +2,47 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { ethers } from "ethers"
 import { Row, Col, Card, Button, Form } from 'react-bootstrap'
+import { Contract } from '@ethersproject/contracts'
 
 
 
 const Home = ({ marketplace }) => {
     const [loading, setLoading] = useState(true)
     const [listings, setListings] = useState([])
+    const [listingCounter, setListingCounter] = useState()
+
     const loadMarketplaceListings = async () => {
         // Load all active listings 
         let listingCount = await marketplace.listingCount()
         listingCount = listingCount.toNumber()
+        setListingCounter(listingCount)
         let listings = []
         for (let i = 1; i <= listingCount; i++) {
             const listing = await marketplace.listings(i)
-            if (listing.auctionState === 'OPEN') {
-                const nft = listing.nft
+            if (listing.auctionState.eq(1)) {
+                const nftResponse = await fetch(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${listing.nft}&apikey=DCV4PCHFIVVYWR83CS48C4J45C9IH8SV93`)
+
+                const nftMetadata = await nftResponse.json()
+                const nftAbi = nftMetadata.result
+
+                // Get provider from Metamask
+                const provider = new ethers.providers.Web3Provider(window.ethereum)
+                // Set signer
+                const signer = provider.getSigner()
+                const nft = new Contract(listing.nft, nftAbi, signer)
                 // get uri url from nft contract
-                const uri = await nft.tokenURI(listing.tokenId)
+                let uri = await nft.tokenURI(listing.tokenId)
+                uri = uri.replace("ipfs://", "https://ipfs.io/ipfs/")
                 // use uri to fetch the nft metadata stored on ipfs 
 
                 const response = await fetch(uri)
 
                 const metadata = await response.json()
                 // get current price of listing
-                const currentPrice = listing.currentPrice
+                let currentPrice = listing.currentPrice
+                currentPrice = (currentPrice / (10 ** 16)) / 100
+                let image = metadata.image
+                image = image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                 // push to array
                 listings.push({
                     price: currentPrice,
@@ -33,7 +50,7 @@ const Home = ({ marketplace }) => {
                     seller: listing.seller,
                     name: metadata.name,
                     description: metadata.description,
-                    image: metadata.image,
+                    image: image,
                     time: listing.closingTime
                 })
             }
@@ -51,7 +68,7 @@ const Home = ({ marketplace }) => {
 
     useEffect(() => {
         loadMarketplaceListings()
-    })
+    }, [])
 
 
     if (loading) return (
@@ -69,10 +86,11 @@ const Home = ({ marketplace }) => {
                                 <Card>
                                     <Card.Img variant="top" src={listing.image} />
                                     <Card.Body color="secondary">
-                                        <Card.Title>{listing.name}</Card.Title>
+                                        <Card.Title>{listing.price} ETH</Card.Title>
                                         <Card.Text>
-                                            {listing.description}
+                                            {listing.name}
                                         </Card.Text>
+                                        <Card.Text>{listing.description}</Card.Text>
                                     </Card.Body>
                                     <Card.Footer>
                                         <div className='d-grid'>
@@ -91,6 +109,7 @@ const Home = ({ marketplace }) => {
                 : (
                     <main style={{ padding: "1rem 0" }}>
                         <h2>No open auctions</h2>
+                        <h5> Listing Count: {listingCounter}</h5>
                     </main>
                 )}
         </div>

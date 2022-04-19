@@ -73,8 +73,7 @@ contract Marketplace is ReentrancyGuard {
         );
         require(_closingTime >= (1), "Auction length must be at least 1 day");
         listingCount++;
-        _nft.setApprovalForAll(address(this), true);
-        _nft.safeTransferFrom(msg.sender, address(this), _tokenId);
+        _nft.transferFrom(msg.sender, address(this), _tokenId);
         listings[listingCount] = Listing(
             listingCount,
             _tokenId,
@@ -110,7 +109,7 @@ contract Marketplace is ReentrancyGuard {
     }
 
     function endAuction(uint256 _listingId) external nonReentrant {
-        Listing memory listing = listings[_listingId];
+        Listing storage listing = listings[_listingId];
         IERC721 nft = listing.nft;
         require(msg.sender == listing.buyer, "Action not authorized");
         require(
@@ -141,7 +140,7 @@ contract Marketplace is ReentrancyGuard {
     }
 
     function cancelListing(uint256 _listingId) external nonReentrant {
-        Listing memory listing = listings[_listingId];
+        Listing storage listing = listings[_listingId];
         IERC721 nft = listing.nft;
         require(
             listing.auctionState == 1 || listing.auctionState == 3,
