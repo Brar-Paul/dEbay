@@ -14,20 +14,6 @@ const Create = ({ marketplace }) => {
     const [nft, setNft] = useState('')
     const [tokenId, setTokenId] = useState(0)
 
-    // const uploadToIPFS = async (event) => {
-    //     event.preventDefault()
-    //     // No longer needed 
-    //     const file = event.target.files[0]
-    //     if (typeof file !== 'undefined') {
-    //         try {
-    //             const result = await client.add(file)
-    //             console.log(result)
-    //             setImage(`https://gateway.ipfs.io/ipfs/${result.path}`)
-    //         } catch (error) {
-    //             console.log("ipfs image upload error: ", error)
-    //         }
-    //     }
-    // }
     const createListing = async () => {
         if (!name || !description || !reserve || !tokenId) return
         // Add listing to marketplace
@@ -42,22 +28,13 @@ const Create = ({ marketplace }) => {
         await (await nftInstance.setApprovalForAll(marketplace.address, true)).wait()
         await (await marketplace.createListing(reserve, startPrice, closing, tokenId, nft)).wait()
     }
-    // const mintThenList = async (result) => {
-    //     const uri = `https://gateway.ipfs.io/ipfs/${result.path}`
-    //     // mint nft 
-    //     await (await nft.mint(uri)).wait()
-    //     // get tokenId of new nft 
-    //     const id = await nft.tokenCount()
-    //     // approve marketplace to spend nft
-    //     await (await nft.setApprovalForAll(marketplace.address, true)).wait()
-    //     // add nft to marketplace
-    //     await (await marketplace.createListing(reserve, startPrice, closing, id, nft.address, escrow)).wait()
-    // }
+
     return (
         <div className="container-fluid mt-5">
             <div className="row">
                 <main role="main" className="col-lg-12 mx-auto" style={{ maxWidth: '1000px' }}>
                     <div className="content mx-auto">
+                        <h1 className='text-center my-2' > Create an Auction Listing</h1>
                         <Row className="g-4">
                             <Form.Control onChange={(e) => setName(e.target.value)} size="lg" required type="text" placeholder="Name" />
                             <Form.Control onChange={(e) => setNft(e.target.value)} size="lg" required type="text" placeholder="NFT Contract" />

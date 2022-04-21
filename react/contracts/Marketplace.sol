@@ -92,6 +92,7 @@ contract Marketplace is ReentrancyGuard {
     function bid(uint256 _listingId, uint256 _bidPrice) external nonReentrant {
         uint256 bidPrice = _bidPrice * (10**16);
         Listing storage listing = listings[_listingId];
+        require(block.timestamp > listing.closingTime, "Auction has ended");
         require(
             weth.balanceOf(msg.sender) > listing.currentPrice,
             "You don't have enough ETH to cover this bid!"

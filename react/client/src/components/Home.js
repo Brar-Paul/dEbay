@@ -3,19 +3,20 @@ import { useState, useEffect } from 'react'
 import { ethers } from "ethers"
 import { Row, Col, Card, Button, Form } from 'react-bootstrap'
 import { Contract } from '@ethersproject/contracts'
+import ABI from "../WETH/ABI.json"
 
-
+const Web3 = require("web3")
+const moment = require('moment')
 
 const Home = ({ marketplace }) => {
     const [loading, setLoading] = useState(true)
     const [listings, setListings] = useState([])
-    const [listingCounter, setListingCounter] = useState()
-
+    const [bid, setBid] = useState(null)
+    const [signer, setSigner] = useState()
     const loadMarketplaceListings = async () => {
         // Load all active listings 
         let listingCount = await marketplace.listingCount()
         listingCount = listingCount.toNumber()
-        setListingCounter(listingCount)
         let listings = []
         for (let i = 1; i <= listingCount; i++) {
             const listing = await marketplace.listings(i)
@@ -29,6 +30,7 @@ const Home = ({ marketplace }) => {
                 const provider = new ethers.providers.Web3Provider(window.ethereum)
                 // Set signer
                 const signer = provider.getSigner()
+                setSigner(signer)
                 const nft = new Contract(listing.nft, nftAbi, signer)
                 // get uri url from nft contract
                 let uri = await nft.tokenURI(listing.tokenId)
@@ -43,6 +45,9 @@ const Home = ({ marketplace }) => {
                 currentPrice = (currentPrice / (10 ** 16)) / 100
                 let image = metadata.image
                 image = image.replace('ipfs://', 'https://ipfs.io/ipfs/')
+                // Convert time 
+                let convertedTime = moment.unix(listing.closingTime)
+                convertedTime = convertedTime.toString()
                 // push to array
                 listings.push({
                     price: currentPrice,
@@ -51,7 +56,7 @@ const Home = ({ marketplace }) => {
                     name: metadata.name,
                     description: metadata.description,
                     image: image,
-                    time: listing.closingTime
+                    time: convertedTime
                 })
             }
         }
@@ -59,10 +64,16 @@ const Home = ({ marketplace }) => {
         setListings(listings)
     }
 
-    const [bid, setBid] = useState(null)
+
 
     const bidOnListing = async (listing, bidPrice) => {
+        const wethAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+        const weth = new ethers.Contract(wethAddress, ABI, signer)
+        let adjustedPrice = bidPrice / 100
+        adjustedPrice = adjustedPrice.toString()
+        adjustedPrice = Web3.utils.toWei(adjustedPrice, "ether")
         await (await marketplace.bid(listing.listingId, bidPrice)).wait()
+        await (await weth.approve(marketplace.address, adjustedPrice)).wait()
         loadMarketplaceListings()
     }
 
@@ -91,16 +102,27 @@ const Home = ({ marketplace }) => {
                                             {listing.name}
                                         </Card.Text>
                                         <Card.Text>{listing.description}</Card.Text>
+                                        {Date.now() > listing.time &&
+                                            <Card.Text>Time Remaining: {moment(listing.time).fromNow()}</Card.Text>
+                                        }
                                     </Card.Body>
-                                    <Card.Footer>
-                                        <div className='d-grid'>
-                                            <Form.Control onChange={(e) => setBid(e.target.value)} size="lg" required type="number" placeholder="Price in 1/100 ETH" />
-                                            <Form.Text className='text-muted'>Price in 1/100 ETH, e.g. input 2 to bid 0.02 ETH</Form.Text>
-                                            <Button onClick={() => bidOnListing(listing, bid)} variant="primary" size="lg">
-                                                Bid Now!
-                                            </Button>
-                                        </div>
-                                    </Card.Footer>
+                                    {Date.now() > listing.time ?
+                                        <Card.Footer>
+                                            <div className='d-grid'>
+                                                <Form.Control onChange={(e) => setBid(e.target.value)} size="lg" required type="number" placeholder="Price in 1/100 ETH" />
+                                                <Form.Text className='text-muted'>Price in 1/100 ETH, e.g. input 2 to bid 0.02 ETH</Form.Text>
+                                                <Button onClick={() => bidOnListing(listing, bid)} variant="primary" size="lg">
+                                                    Bid Now!
+                                                </Button>
+                                            </div>
+                                        </Card.Footer> :
+
+                                        <Card.Footer>
+                                            <Card.Text>Listing Ended</Card.Text>
+                                        </Card.Footer>
+
+                                    }
+
                                 </Card>
                             </Col>
                         ))}
@@ -109,7 +131,6 @@ const Home = ({ marketplace }) => {
                 : (
                     <main style={{ padding: "1rem 0" }}>
                         <h2>No open auctions</h2>
-                        <h5> Listing Count: {listingCounter}</h5>
                     </main>
                 )}
         </div>
