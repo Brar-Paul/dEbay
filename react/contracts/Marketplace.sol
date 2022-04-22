@@ -27,8 +27,6 @@ contract Marketplace is ReentrancyGuard {
     // auctionState legend: 1 = Open, 2 = Closed, 3 = Reverted
 
     mapping(uint256 => Listing) public listings;
-    mapping(uint256 => IERC721) public listingNFT;
-    mapping(uint256 => uint256) public listingTokenId;
 
     event Listed(uint256 indexed listingId, address indexed seller);
 
@@ -46,7 +44,6 @@ contract Marketplace is ReentrancyGuard {
         address indexed buyer
     );
 
-    event Closed(uint256 indexed listingId, address seller, address buyer);
     event Reverted(
         uint256 listingId,
         address indexed seller,
@@ -73,6 +70,7 @@ contract Marketplace is ReentrancyGuard {
         );
         require(_closingTime >= (1), "Auction length must be at least 1 day");
         listingCount++;
+        // setApprovalForAll is handled via front end before calling contract function
         _nft.transferFrom(msg.sender, address(this), _tokenId);
         listings[listingCount] = Listing(
             listingCount,
@@ -103,8 +101,8 @@ contract Marketplace is ReentrancyGuard {
         );
         require(listing.auctionState == 1, "This item is not open for bidding");
         listing.buyer = payable(msg.sender);
-        weth.approve(address(this), bidPrice);
         listing.currentPrice = bidPrice;
+        // Call to approve weth transaction for value of bidprice is handled via front end
         listing.bidCounter++;
         emit Bid(_listingId, bidPrice, listing.seller, listing.buyer);
     }
@@ -112,10 +110,17 @@ contract Marketplace is ReentrancyGuard {
     function endAuction(uint256 _listingId) external nonReentrant {
         Listing storage listing = listings[_listingId];
         IERC721 nft = listing.nft;
-        require(msg.sender == listing.buyer, "Action not authorized");
+        require(
+            listing.currentPrice >= listing.reservePrice,
+            "Reserve not met"
+        );
         require(
             block.timestamp > listing.closingTime,
             "Auction is still running"
+        );
+        require(
+            msg.sender == listing.buyer || msg.sender == listing.seller,
+            "Action not authorized"
         );
         if (weth.balanceOf(listing.buyer) < listing.currentPrice) {
             revert(
@@ -136,7 +141,12 @@ contract Marketplace is ReentrancyGuard {
             );
             nft.safeTransferFrom(address(this), listing.buyer, listing.tokenId);
             listing.auctionState = 2;
-            emit Closed(listing.listingId, listing.seller, listing.seller);
+            emit Bought(
+                listing.listingId,
+                listing.currentPrice,
+                listing.seller,
+                listing.seller
+            );
         }
     }
 
@@ -148,103 +158,8 @@ contract Marketplace is ReentrancyGuard {
             "Action is not authorized"
         );
         require(listing.seller == msg.sender);
-        uint256 feeAmount = listing.currentPrice * (feePercent / 100);
-        weth.approve(address(this), feeAmount);
-        require(
-            weth.transferFrom(listing.seller, feeAccount, feeAmount),
-            "Not enough funds to cancel listing"
-        );
         nft.safeTransferFrom(address(this), listing.seller, listing.tokenId);
         listing.auctionState = 2;
+        emit Reverted(_listingId, listing.seller, listing.buyer);
     }
 }
-
-// The code below is for implementation of escrow functionality to be implemented at a later date
-
-// event confirmedEscrow(uint256 indexed listingId, address seller);
-// event WithdrawEscrow(
-//     uint256 indexed listingId,
-//     address seller,
-//     address buyer
-// );
-
-//     function confirmEscrow(uint256 _listingId) external {
-//     Listing memory listing = listings[_listingId];
-//     require(msg.sender == listing.buyer, "Only buyer can finalize escrow");
-//     require(listing.auctionState == AUCTION_STATE.PENDING);
-//     require(
-//         block.timestamp < listing.escrowClosingTime,
-//         "Escrow has expired, the sale will be reversed"
-//     );
-//     listing.seller.transfer(
-//         listing.currentPrice * (1 - (100 - feePercent / 100))
-//     );
-//     weth.transferFrom(
-//         address(this),
-//         feeAccount,
-//         listing.currentPrice * (feePercent / 100)
-//     );
-//     listing.nft.safeTransferFrom(
-//         address(this),
-//         listing.buyer,
-//         listing.tokenId
-//     );
-//     listing.auctionState = AUCTION_STATE.FINALIZED;
-//     emit confirmedEscrow(_listingId, listing.seller);
-// }
-
-// function withdrawEscrow(uint256 _listingId) external {
-//     Listing memory listing = listings[_listingId];
-//     require(
-//         msg.sender == listing.buyer,
-//         "Only buyer can withdraw from escrow"
-//     );
-//     require(listing.auctionState == AUCTION_STATE.PENDING);
-//     require(
-//         block.timestamp > listing.escrowClosingTime,
-//         "The escrow time has not expired yet"
-//     );
-//     weth.transferFrom(
-//         address(this),
-//         listing.buyer,
-//         listing.currentPrice * (100 - feePercent)
-//     );
-//     listing.nft.safeTransferFrom(
-//         address(this),
-//         listing.seller,
-//         listing.tokenId
-//     );
-//     listing.auctionState = AUCTION_STATE.FINALIZED;
-//     emit WithdrawEscrow(_listingId, listing.seller, listing.buyer);
-// }
-
-// if (!listing.escrow) {
-//     listing.auctionState == AUCTION_STATE.FINALIZED;
-//     weth.transferFrom(
-//         listing.buyer,
-//         listing.seller,
-//         listing.currentPrice * (1 - feePercent)
-//     );
-//     weth.transferFrom(
-//         listing.buyer,
-//         feeAccount,
-//         listing.currentPrice * feePercent
-//     );
-//     listing.nft.safeTransferFrom(
-//         address(this),
-//         listing.buyer,
-//         listing.tokenId
-//     );
-//     emit Bought(
-//         _listingId,
-//         listing.currentPrice,
-//         listing.seller,
-//         listing.buyer
-//     );
-// } else {
-//     weth.transferFrom(
-//         listing.buyer,
-//         address(this),
-//         listing.currentPrice
-//     );
-//     listing.auctionState == AUCTION_STATE.PENDING;

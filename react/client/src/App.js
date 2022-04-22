@@ -84,7 +84,6 @@ function App() {
                         </Routes>
                     )}
                 </div>
-                <h2> Marketplace Address: {marketplace.address}</h2>
             </div>
         </BrowserRouter>
 

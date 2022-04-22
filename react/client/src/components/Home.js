@@ -130,7 +130,7 @@ const Home = ({ marketplace }) => {
                 </div>
                 : (
                     <main style={{ padding: "1rem 0" }}>
-                        <h2>No open auctions</h2>
+                        <h2>No Open Auctions</h2>
                     </main>
                 )}
         </div>

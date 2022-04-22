@@ -49,7 +49,6 @@ const Create = ({ marketplace }) => {
                                 </Button>
                             </div>
                         </Row>
-                        <h1>NFT: {nft}</h1>
                     </div>
                 </main>
             </div>
