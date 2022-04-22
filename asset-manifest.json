@@ -1,25 +1,25 @@
 {
   "files": {
     "main.css": "/dEbay/static/css/main.23897544.chunk.css",
-    "main.js": "/dEbay/static/js/main.1ff0ad92.chunk.js",
-    "main.js.map": "/dEbay/static/js/main.1ff0ad92.chunk.js.map",
+    "main.js": "/dEbay/static/js/main.6102fdde.chunk.js",
+    "main.js.map": "/dEbay/static/js/main.6102fdde.chunk.js.map",
     "runtime-main.js": "/dEbay/static/js/runtime-main.4fb558b5.js",
     "runtime-main.js.map": "/dEbay/static/js/runtime-main.4fb558b5.js.map",
     "static/css/2.171a7357.chunk.css": "/dEbay/static/css/2.171a7357.chunk.css",
-    "static/js/2.67e8919f.chunk.js": "/dEbay/static/js/2.67e8919f.chunk.js",
-    "static/js/2.67e8919f.chunk.js.map": "/dEbay/static/js/2.67e8919f.chunk.js.map",
+    "static/js/2.269ec263.chunk.js": "/dEbay/static/js/2.269ec263.chunk.js",
+    "static/js/2.269ec263.chunk.js.map": "/dEbay/static/js/2.269ec263.chunk.js.map",
     "index.html": "/dEbay/index.html",
-    "precache-manifest.7966183dd6c29082235375563f469ee6.js": "/dEbay/precache-manifest.7966183dd6c29082235375563f469ee6.js",
+    "precache-manifest.4af5b9465b065ef520c1caeb1ed24024.js": "/dEbay/precache-manifest.4af5b9465b065ef520c1caeb1ed24024.js",
     "service-worker.js": "/dEbay/service-worker.js",
     "static/css/2.171a7357.chunk.css.map": "/dEbay/static/css/2.171a7357.chunk.css.map",
     "static/css/main.23897544.chunk.css.map": "/dEbay/static/css/main.23897544.chunk.css.map",
-    "static/js/2.67e8919f.chunk.js.LICENSE.txt": "/dEbay/static/js/2.67e8919f.chunk.js.LICENSE.txt"
+    "static/js/2.269ec263.chunk.js.LICENSE.txt": "/dEbay/static/js/2.269ec263.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.4fb558b5.js",
     "static/css/2.171a7357.chunk.css",
-    "static/js/2.67e8919f.chunk.js",
+    "static/js/2.269ec263.chunk.js",
     "static/css/main.23897544.chunk.css",
-    "static/js/main.1ff0ad92.chunk.js"
+    "static/js/main.6102fdde.chunk.js"
   ]
 }
