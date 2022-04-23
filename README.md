@@ -9,3 +9,10 @@ the user approves the auction contract to spend their wETH in the amount of the 
 the bid amount is transfered from buyer to seller (minus the fee that is sent to feeAccount)
 
 To run, clone this repository, install NPM dependencies, add .env file with wallet private key (rinkeby testnet).
+
+# To-Dos/ Coming Soon
+
+1) Event based notifications
+2) Revised bidding approval logic
+3) NFT Minting
+4) multiple currency support
