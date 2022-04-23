@@ -1,5 +1,9 @@
 # dEbay: Decentralized NFT Auction 
 
+
+<img width="1439" alt="dEbay" src="https://user-images.githubusercontent.com/66369210/164917205-2b638ba0-b8e1-48bd-8c84-ede12d21ae5b.png">
+
+
 dEbay is a decentralized NFT auction site that allows users to list their already minted NFTs to be offered 
 on auction. Users can set their reserve price, starting price, and auction length (in days). The auction takes 
 Wrapped Ether (wETH) as payment and charges a fee percentage based on sale price. The fee percentage is set during contract deployment (deployed example is set to 2% fee) and the fee account is the account of the user that deployed the contract. 
