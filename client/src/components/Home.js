@@ -47,7 +47,6 @@ const Home = ({ marketplace }) => {
                 image = image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                 // Convert time 
                 let convertedTime = moment.unix(listing.closingTime)
-                convertedTime = convertedTime.toString()
                 // push to array
                 listings.push({
                     price: currentPrice,
@@ -102,14 +101,14 @@ const Home = ({ marketplace }) => {
                                             {listing.name}
                                         </Card.Text>
                                         <Card.Text>{listing.description}</Card.Text>
-                                        {Date.now() > listing.time &&
-                                            <Card.Text>Time Remaining: {moment(listing.time).fromNow()}</Card.Text>
+                                        {Date.now() < listing.time &&
+                                            <Card.Text>Closing Time: {moment(listing.time).format('lll')}</Card.Text>
                                         }
                                     </Card.Body>
-                                    {Date.now() > listing.time ?
+                                    {Date.now() < listing.time ?
                                         <Card.Footer>
                                             <div className='d-grid'>
-                                                <Form.Control onChange={(e) => setBid(e.target.value)} size="lg" required type="number" placeholder="Price in 1/100 ETH" />
+                                                <Form.Control onChange={(e) => setBid(e.target.value)} size="lg" required type="number" placeholder="Bid Amount" />
                                                 <Form.Text className='text-muted'>Price in 1/100 ETH, e.g. input 2 to bid 0.02 ETH</Form.Text>
                                                 <Button onClick={() => bidOnListing(listing, bid)} variant="primary" size="lg">
                                                     Bid Now!

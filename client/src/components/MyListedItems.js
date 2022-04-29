@@ -18,7 +18,7 @@ function renderSoldListings(listings) {
                             <Card.Img variant="top" src={listing.image} />
                             <Card.Text>For {listing.price} ETH</Card.Text>
                             <Card.Footer>
-                                <Card.Text>Closed on: {listing.time}</Card.Text>
+                                <Card.Text>Closed on: {moment(listing.time).format('lll')}</Card.Text>
                             </Card.Footer>
                         </Card>
                     </Col>
@@ -76,7 +76,7 @@ export default function MyListings({ marketplace, account }) {
                 image = image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                 // Get Listing time and convert
                 let convertedTime = moment.unix(i.closingTime)
-                convertedTime = convertedTime.toString()
+                //convertedTime = convertedTime.toString()
                 // Convert AuctionState to Int
                 let auctionState = i.auctionState
                 auctionState = auctionState.toNumber()
@@ -89,7 +89,8 @@ export default function MyListings({ marketplace, account }) {
                     image: image,
                     auctionState: auctionState,
                     time: convertedTime,
-                    reserve: reservePrice
+                    reserve: reservePrice,
+                    bidCount: i.bidCounter.toNumber()
                 }
                 allListings.push(listing)
                 // Add listed item to sold items array if sold
@@ -116,13 +117,14 @@ export default function MyListings({ marketplace, account }) {
                     <Row xs={1} md={2} lg={4} className="g-4 py-3">
                         {listings.map((listing, idx) => (
                             <Col key={idx} className="overflow-hidden">
-                                {Date.now() > listing.time ?
+                                {Date.now() < listing.time ?
                                     <Card>
                                         <Card.Img variant="top" src={listing.image} />
                                         <Card.Footer>
                                             <Card.Text>Auction Running</Card.Text>
                                             <Card.Text>Current Price: {listing.price} wETH</Card.Text>
-                                            <Card.Text>Time Remaining: {moment(listing.time).fromNow()}</Card.Text>
+                                            <Card.Text>Closing Time: {moment(listing.time).format('lll')}</Card.Text>
+                                            <Card.Text>Bid Count: {listing.bidCount}</Card.Text>
                                             <Button onClick={() => cancelAuction(listing)} variant="warning" size="sm" className='m-2'>
                                                 Cancel Auction and Return NFT
                                             </Button>
@@ -134,6 +136,7 @@ export default function MyListings({ marketplace, account }) {
                                             <Card.Footer>
                                                 <Card.Text>Auction Time Elapsed</Card.Text>
                                                 <Card.Text>Final Price: {listing.price} wETH</Card.Text>
+                                                <Card.Text>Bid Count: {listing.bidCount}</Card.Text>
                                                 {listing.price >= listing.reserve &&
                                                     <Button onClick={() => endAuction(listing)} variant="success" size="sm" className='m-2'>
                                                         Finalize and Collect Payment
@@ -150,6 +153,7 @@ export default function MyListings({ marketplace, account }) {
                                                 <Card.Footer>
                                                     <Card.Text>Auction Reverted</Card.Text>
                                                     <Card.Text>Final Price: {listing.price} wETH</Card.Text>
+                                                    <Card.Text>Bid Count: {listing.bidCount}</Card.Text>
                                                     <Button onClick={() => cancelAuction(listing)} variant="warning" size="sm" className='m-2'>
                                                         Cancel Auction and Return NFT
                                                     </Button>
@@ -160,6 +164,7 @@ export default function MyListings({ marketplace, account }) {
                                                 <Card.Img variant="top" src={listing.image} />
                                                 <Card.Footer>
                                                     <Card.Text>Auction Finalized</Card.Text>
+                                                    <Card.Text>Bid Count: {listing.bidCount}</Card.Text>
                                                     <Card.Text>Final Price: {listing.price} wETH</Card.Text>
                                                 </Card.Footer>
                                             </Card>

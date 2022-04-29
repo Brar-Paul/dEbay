@@ -35,6 +35,7 @@ const Create = ({ marketplace }) => {
                 <main role="main" className="col-lg-12 mx-auto" style={{ maxWidth: '1000px' }}>
                     <div className="content mx-auto">
                         <h1 className='text-center my-2' > Create an Auction Listing</h1>
+                        <p>Once you submit the form metamask will prompt for confirmation TWICE. Accept both to list your NFT </p>
                         <Row className="g-4">
                             <Form.Control onChange={(e) => setName(e.target.value)} size="lg" required type="text" placeholder="Name" />
                             <Form.Control onChange={(e) => setNft(e.target.value)} size="lg" required type="text" placeholder="NFT Contract" />
