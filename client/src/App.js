@@ -69,16 +69,16 @@ function App() {
                         </div>
                     ) : (
                         <Routes>
-                            <Route path="/dEbay" element={
+                            <Route path="/" element={
                                 <Home marketplace={marketplace} />
                             } />
-                            <Route path="/dEbay/create" element={
+                            <Route path="/create" element={
                                 <Create marketplace={marketplace} />
                             } />
-                            <Route path="/dEbay/my-listed-items" element={
+                            <Route path="/my-listed-items" element={
                                 <MyListedItems marketplace={marketplace} account={account} />
                             } />
-                            <Route path="/dEbay/my-purchases" element={
+                            <Route path="/my-purchases" element={
                                 <MyPurchases marketplace={marketplace} account={account} />
                             } />
                         </Routes>
