@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "b44889b8e9120ce74e1b6cc79b5b944e",
+    "revision": "3a80b48859c1480c506963bf441386a1",
     "url": "/dEbay/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/dEbay/static/css/2.171a7357.chunk.css"
   },
   {
-    "revision": "b53e7585cd18dbec1db9",
+    "revision": "bc27b3e70069bc5fb28f",
     "url": "/dEbay/static/css/main.23897544.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/dEbay/static/js/2.1790b688.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "b53e7585cd18dbec1db9",
-    "url": "/dEbay/static/js/main.77b5da3d.chunk.js"
+    "revision": "bc27b3e70069bc5fb28f",
+    "url": "/dEbay/static/js/main.076ca23b.chunk.js"
   },
   {
     "revision": "b3cc2da67e587a184a8f",

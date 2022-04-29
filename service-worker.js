@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/dEbay/precache-manifest.d28becb322d8bddcc8d0b5054dc2ffa0.js"
+  "/dEbay/precache-manifest.6ab4b1164853f982786f235c49876dab.js"
 );
 
 self.addEventListener('message', (event) => {
