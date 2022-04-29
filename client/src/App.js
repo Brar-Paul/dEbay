@@ -61,6 +61,10 @@ function App() {
                 <>
                     <Navigation web3Handler={web3Handler} account={account} />
                 </>
+                <h1 className='mt-2'>dEbay NFT Auction</h1>
+                <p> This project is deployed to the Rinkeby test net, please set your metamask accordingly</p>
+                <a href='https://github.com/Brar-Paul/dEbay'>Link to GitHub Repo</a> <br />
+                <a href='https://faucets.chain.link/'>Rinkeby Faucet</a>
                 <div>
                     {loading ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
@@ -69,16 +73,16 @@ function App() {
                         </div>
                     ) : (
                         <Routes>
-                            <Route path="/" element={
+                            <Route path="/dEbay" element={
                                 <Home marketplace={marketplace} />
                             } />
-                            <Route path="/create" element={
+                            <Route path="/dEbay/create" element={
                                 <Create marketplace={marketplace} />
                             } />
-                            <Route path="/my-listed-items" element={
+                            <Route path="/dEbay/my-listed-items" element={
                                 <MyListedItems marketplace={marketplace} account={account} />
                             } />
-                            <Route path="/my-purchases" element={
+                            <Route path="/dEbay/my-purchases" element={
                                 <MyPurchases marketplace={marketplace} account={account} />
                             } />
                         </Routes>

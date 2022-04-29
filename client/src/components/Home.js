@@ -88,10 +88,6 @@ const Home = ({ marketplace }) => {
     )
     return (
         <div className="flex justify-center">
-            <h1 className='mt-2'>dEbay NFT Auction</h1>
-            <p> This project is deployed to the Rinkeby test net, please set your metamask accordingly</p>
-            <a href='https://github.com/Brar-Paul/dEbay'>Link to GitHub Repo</a> <br />
-            <a href='https://faucets.chain.link/'>Rinkeby Faucet</a>
             {listings.length > 0 ?
                 <div className="px-5 container">
                     <Row xs={1} md={2} lg={4} className="g-4 py-5">
