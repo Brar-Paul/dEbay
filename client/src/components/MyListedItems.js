@@ -16,9 +16,9 @@ function renderSoldListings(listings) {
                     <Col key={idx} className="overflow-hidden">
                         <Card>
                             <Card.Img variant="top" src={listing.image} />
-                            <Card.Text>For {listing.price} ETH</Card.Text>
+                            <Card.Text>For {listing.price} wETH</Card.Text>
                             <Card.Footer>
-                                <Card.Text>Closed on: {moment(listing.time).format('lll')}</Card.Text>
+                                <Card.Text>Closing Time: {moment(listing.time).format('lll')}</Card.Text>
                             </Card.Footer>
                         </Card>
                     </Col>
@@ -69,9 +69,9 @@ export default function MyListings({ marketplace, account }) {
                 const metadata = await response.json()
                 // format price and image 
                 let currentPrice = i.currentPrice
-                currentPrice = (currentPrice / (10 ** 16)) / 100
+                currentPrice = parseFloat(ethers.utils.formatUnits(currentPrice, 18))
                 let reservePrice = i.reservePrice
-                reservePrice = (reservePrice / (10 ** 16)) / 100
+                reservePrice = parseFloat(ethers.utils.formatUnits(reservePrice, 18))
                 let image = metadata.image
                 image = image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                 // Get Listing time and convert
@@ -113,11 +113,11 @@ export default function MyListings({ marketplace, account }) {
         <div className="flex justify-center">
             {listings.length > 0 ?
                 <div className="px-5 py-3 container">
-                    <h2>Your Listed NFTs</h2>
+                    <h2>All Listings</h2>
                     <Row xs={1} md={2} lg={4} className="g-4 py-3">
                         {listings.map((listing, idx) => (
                             <Col key={idx} className="overflow-hidden">
-                                {Date.now() < listing.time ?
+                                {((Date.now() < listing.time) && (listing.auctionState !== 2)) ?
                                     <Card>
                                         <Card.Img variant="top" src={listing.image} />
                                         <Card.Footer>

@@ -75,8 +75,8 @@ contract Marketplace is ReentrancyGuard {
         listings[listingCount] = Listing(
             listingCount,
             _tokenId,
-            (_reservePrice * (10**16)),
-            (_startPrice * (10**16)),
+            _reservePrice,
+            _startPrice,
             payable(msg.sender),
             _nft,
             1,
@@ -88,23 +88,22 @@ contract Marketplace is ReentrancyGuard {
     }
 
     function bid(uint256 _listingId, uint256 _bidPrice) external nonReentrant {
-        uint256 bidPrice = _bidPrice * (10**16);
         Listing storage listing = listings[_listingId];
-        require(block.timestamp > listing.closingTime, "Auction has ended");
+        require(block.timestamp < listing.closingTime, "Auction has ended");
         require(
             weth.balanceOf(msg.sender) > listing.currentPrice,
             "You don't have enough ETH to cover this bid!"
         );
         require(
-            bidPrice > listing.currentPrice,
+            _bidPrice > listing.currentPrice,
             "Bid must be more than the current price, duh!"
         );
         require(listing.auctionState == 1, "This item is not open for bidding");
         listing.buyer = payable(msg.sender);
-        listing.currentPrice = bidPrice;
+        listing.currentPrice = _bidPrice;
         // Call to approve weth transaction for value of bidprice is handled via front end
         listing.bidCounter++;
-        emit Bid(_listingId, bidPrice, listing.seller, listing.buyer);
+        emit Bid(_listingId, _bidPrice, listing.seller, listing.buyer);
     }
 
     function endAuction(uint256 _listingId) external nonReentrant {

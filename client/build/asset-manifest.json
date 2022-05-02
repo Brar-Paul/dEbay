@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/dEbay/static/css/main.23897544.chunk.css",
-    "main.js": "/dEbay/static/js/main.076ca23b.chunk.js",
-    "main.js.map": "/dEbay/static/js/main.076ca23b.chunk.js.map",
+    "main.js": "/dEbay/static/js/main.d538b45c.chunk.js",
+    "main.js.map": "/dEbay/static/js/main.d538b45c.chunk.js.map",
     "runtime-main.js": "/dEbay/static/js/runtime-main.67942050.js",
     "runtime-main.js.map": "/dEbay/static/js/runtime-main.67942050.js.map",
     "static/css/2.171a7357.chunk.css": "/dEbay/static/css/2.171a7357.chunk.css",
     "static/js/2.1790b688.chunk.js": "/dEbay/static/js/2.1790b688.chunk.js",
     "static/js/2.1790b688.chunk.js.map": "/dEbay/static/js/2.1790b688.chunk.js.map",
     "index.html": "/dEbay/index.html",
-    "precache-manifest.6ab4b1164853f982786f235c49876dab.js": "/dEbay/precache-manifest.6ab4b1164853f982786f235c49876dab.js",
+    "precache-manifest.978604bb87f74dc3ef606bcd142b8113.js": "/dEbay/precache-manifest.978604bb87f74dc3ef606bcd142b8113.js",
     "service-worker.js": "/dEbay/service-worker.js",
     "static/css/2.171a7357.chunk.css.map": "/dEbay/static/css/2.171a7357.chunk.css.map",
     "static/css/main.23897544.chunk.css.map": "/dEbay/static/css/main.23897544.chunk.css.map",
@@ -20,6 +20,6 @@
     "static/css/2.171a7357.chunk.css",
     "static/js/2.1790b688.chunk.js",
     "static/css/main.23897544.chunk.css",
-    "static/js/main.076ca23b.chunk.js"
+    "static/js/main.d538b45c.chunk.js"
   ]
 }

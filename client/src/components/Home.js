@@ -1,11 +1,10 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { ethers } from "ethers"
+import { ethers, utils } from "ethers"
 import { Row, Col, Card, Button, Form } from 'react-bootstrap'
 import { Contract } from '@ethersproject/contracts'
 import ABI from "../WETH/ABI.json"
 
-const Web3 = require("web3")
 const moment = require('moment')
 
 const Home = ({ marketplace }) => {
@@ -40,16 +39,15 @@ const Home = ({ marketplace }) => {
                 const response = await fetch(uri)
 
                 const metadata = await response.json()
-                // get current price of listing
-                let currentPrice = listing.currentPrice
-                currentPrice = (currentPrice / (10 ** 16)) / 100
                 let image = metadata.image
                 image = image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                 // Convert time 
                 let convertedTime = moment.unix(listing.closingTime)
+                // Convert Price
+                let price = parseFloat(ethers.utils.formatUnits(listing.currentPrice, 18))
                 // push to array
                 listings.push({
-                    price: currentPrice,
+                    price: price,
                     listingId: listing.listingId,
                     seller: listing.seller,
                     name: metadata.name,
@@ -68,11 +66,9 @@ const Home = ({ marketplace }) => {
     const bidOnListing = async (listing, bidPrice) => {
         const wethAddress = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
         const weth = new ethers.Contract(wethAddress, ABI, signer)
-        let adjustedPrice = bidPrice / 100
-        adjustedPrice = adjustedPrice.toString()
-        adjustedPrice = Web3.utils.toWei(adjustedPrice, "ether")
-        await (await marketplace.bid(listing.listingId, bidPrice)).wait()
+        let adjustedPrice = utils.parseEther(bidPrice.toString())
         await (await weth.approve(marketplace.address, adjustedPrice)).wait()
+        await (await marketplace.bid(listing.listingId, adjustedPrice.toString())).wait()
         loadMarketplaceListings()
     }
 
@@ -90,17 +86,19 @@ const Home = ({ marketplace }) => {
         <div className="flex justify-center">
             {listings.length > 0 ?
                 <div className="px-5 container">
+                    <h2 className='mt-4'>NFT Listings</h2>
+                    <p>When bidding, metamask will prompt for confirmation TWICE, accept both to bid</p>
                     <Row xs={1} md={2} lg={4} className="g-4 py-5">
                         {listings.map((listing, idx) => (
                             <Col key={idx} className="overflow-hidden">
                                 <Card>
                                     <Card.Img variant="top" src={listing.image} />
                                     <Card.Body color="secondary">
-                                        <Card.Title>{listing.price} ETH</Card.Title>
+                                        <Card.Title>Price: {listing.price} wETH</Card.Title>
                                         <Card.Text>
-                                            {listing.name}
+                                            Name:{listing.name}
                                         </Card.Text>
-                                        <Card.Text>{listing.description}</Card.Text>
+                                        <Card.Text>Desc: {listing.description}</Card.Text>
                                         {Date.now() < listing.time &&
                                             <Card.Text>Closing Time: {moment(listing.time).format('lll')}</Card.Text>
                                         }
@@ -109,7 +107,7 @@ const Home = ({ marketplace }) => {
                                         <Card.Footer>
                                             <div className='d-grid'>
                                                 <Form.Control onChange={(e) => setBid(e.target.value)} size="lg" required type="number" placeholder="Bid Amount" />
-                                                <Form.Text className='text-muted'>Price in 1/100 ETH, e.g. input 2 to bid 0.02 ETH</Form.Text>
+                                                <Form.Text className='text-muted'>Price in wETH</Form.Text>
                                                 <Button onClick={() => bidOnListing(listing, bid)} variant="primary" size="lg">
                                                     Bid Now!
                                                 </Button>

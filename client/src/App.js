@@ -8,15 +8,13 @@ import Home from './components/Home.js'
 import Create from './components/Create.js'
 import MyListedItems from './components/MyListedItems.js'
 import MyPurchases from './components/MyPurchases.js'
-import helperConfig from "./helper-config.json"
 import networkMapping from "./artifacts/deployments/map.json"
-import { useEthers, ChainId } from "@usedapp/core"
 import { useState } from 'react'
 import { ethers } from "ethers"
 import { Spinner } from 'react-bootstrap'
 import React from 'react'
 import Marketplace from './artifacts/contracts/Marketplace.json'
-import { constants, utils } from 'ethers'
+import { utils } from 'ethers'
 
 import './App.css';
 
@@ -45,7 +43,6 @@ function App() {
     }
     const loadContracts = async (signer, provider) => {
         // Get Address and ABI of Marketplace
-        const chainId = provider.ChainId
         const { abi } = Marketplace
         const marketplaceAddress = networkMapping['4']["Marketplace"][0]
         const marketplaceInterface = new utils.Interface(abi)

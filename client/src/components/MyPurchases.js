@@ -33,12 +33,11 @@ export default function MyBids({ marketplace, account }) {
                 const metadata = await response.json()
                 // format price and image 
                 let currentPrice = i.currentPrice
-                currentPrice = (currentPrice / (10 ** 16)) / 100
+                currentPrice = parseFloat(ethers.utils.formatUnits(currentPrice, 18))
                 let image = metadata.image
                 image = image.replace('ipfs://', 'https://ipfs.io/ipfs/')
                 // Get Listing time and convert
                 let convertedTime = moment.unix(i.closingTime)
-                convertedTime = convertedTime.toString()
                 // Convert AuctionState to Int
                 let auctionState = i.auctionState
                 auctionState = auctionState.toNumber()
@@ -76,13 +75,15 @@ export default function MyBids({ marketplace, account }) {
                             <Col key={idx} className="overflow-hidden">
                                 <Card>
                                     <Card.Img variant="top" src={listing.image} />
-                                    {Date.now() > listing.time ?
+                                    {Date.now() < listing.time ?
                                         <Card.Footer>
+                                            <Card.Title>Auction Running</Card.Title>
                                             <Card.Text>Current Price: {listing.price} wETH</Card.Text>
-                                            <Card.Text>Time Remaining: {moment(listing.time).fromNow()}</Card.Text>
+                                            <Card.Text>Closing Time: {moment(listing.time).format('lll')}</Card.Text>
                                         </Card.Footer>
                                         :
                                         <Card.Footer>
+                                            <Card.Title>Auction Completed</Card.Title>
                                             <Card.Text>Final Price: {listing.price} wETH</Card.Text>
                                             <Card.Text>You Won This Auction!</Card.Text>
                                         </Card.Footer>
